@@ -16,11 +16,11 @@ const selectedView = ref(transactionViewOptions[1]);
     <!-- Income Trend -->
     <AppTrend color="green" title="Income" :amount="4000" :last-amount="3000" :loading="false" />
     <!-- Expenses Trend -->
-    <AppTrend color="red" title="Expenses" :amount="4000" :last-amount="3000" :loading="false" />
+    <AppTrend color="red" title="Expenses" :amount="4000" :last-amount="8000" :loading="false" />
     <!-- Savings Trend -->
-    <AppTrend color="green" title="Savings" :amount="4000" :last-amount="3000" :loading="false" />
+    <AppTrend color="green" title="Savings" :amount="4000" :last-amount="5000" :loading="false" />
     <!-- Investment Trend -->
-    <AppTrend color="red" title="Investment" :amount="4000" :last-amount="3000" :loading="false" />
+    <AppTrend color="red" title="Investments" :amount="9000" :last-amount="11000" :loading="false" />
 
   </section>
 </template>
