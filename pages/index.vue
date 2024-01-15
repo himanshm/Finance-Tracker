@@ -20,6 +20,7 @@ const selectedView = ref(transactionViewOptions[1]);
 const supabase = useSupabaseClient();
 const transactions = ref<Transaction[]>([]);
 const isLoading = ref(false);
+const isOpen = ref(false)
 
 const income = computed(() =>
   transactions.value.filter((transaction) => transaction.type === 'Income')
@@ -128,11 +129,25 @@ const transactionsGroupedByDate = computed(() => {
     <div>
       <h2 text-2xl font-extrabold>Transactions</h2>
       <div class="text-gray-500 dark:text-gray-400">
-        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses in this period.
+        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses in
+        this period.
       </div>
     </div>
     <div>
-      <UButton icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add" />
+      <UModal v-model="isOpen">
+        <UCard>
+          <template #header> Add Transaction </template>
+
+          <div>Hello</div>
+        </UCard>
+      </UModal>
+      <UButton
+        icon="i-heroicons-plus-circle"
+        color="white"
+        variant="solid"
+        label="Add"
+        @click="isOpen = true"
+      />
     </div>
   </section>
   <section v-if="!isLoading">
