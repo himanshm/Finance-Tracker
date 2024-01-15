@@ -28,6 +28,31 @@ const iconColor = computed(() =>
 );
 
 const { currency } = useCurrency(props.transaction.amount);
+
+const isLoading = ref(false);
+const toast = useToast(); //  use the useToast composable to add notifications to app
+const supabase = useSupabaseClient();
+const deleteTransaction = async () => {
+  isLoading.value = true;
+
+  try {
+    await supabase
+      .from('transactions-FinanaceFolio')
+      .delete()
+      .eq('id', props.transaction.id);
+    toast.add({
+      title: 'Transaction Deleted',
+      icon: 'i-heroicons-check-circle',
+    });
+  } catch (error) {
+    toast.add({
+      title: 'Transaction Deleted',
+      icon: 'i-heroicons-exclamation-circle',
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
 const items = [
   [
     {
@@ -42,9 +67,7 @@ const items = [
     {
       label: 'Delete',
       icon: 'i-heroicons-trash-20-solid',
-      click: () => {
-        console.log('Delete');
-      },
+      click: deleteTransaction,
     },
   ],
 ];
@@ -77,6 +100,7 @@ const items = [
             color="white"
             variant="ghost"
             trailing-icon="i-heroicons-ellipsis-horizontal"
+            :loading="isLoading"
           />
         </UDropdown>
       </div>
