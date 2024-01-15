@@ -11,6 +11,11 @@ interface Transaction {
   category: string;
 }
 
+// Define the type for the grouped transactions
+interface GroupedTransactions {
+  [key: string]: Transaction[];
+}
+
 const selectedView = ref(transactionViewOptions[1]);
 const supabase = useSupabaseClient();
 const transactions = ref<Transaction[]>([]);
@@ -38,6 +43,22 @@ watch(
   },
   { immediate: true }
 );
+
+const transactionsGroupedByDate = computed(() => {
+  // Define grouped with the correct type
+  let grouped: GroupedTransactions = {};
+
+  for (const transaction of transactions.value) {
+    const date = new Date(transaction.created_at).toISOString().split('T')[0];
+
+    if (!grouped[date]) {
+      grouped[date] = [];
+    }
+    grouped[date].push(transaction);
+  }
+  return grouped;
+});
+console.log(transactionsGroupedByDate.value);
 </script>
 
 <template>
