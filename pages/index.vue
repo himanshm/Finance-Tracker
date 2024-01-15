@@ -21,6 +21,25 @@ const supabase = useSupabaseClient();
 const transactions = ref<Transaction[]>([]);
 const isLoading = ref(false);
 
+const income = computed(() =>
+  transactions.value.filter((transaction) => transaction.type === 'Income')
+);
+
+const expense = computed(() =>
+  transactions.value.filter((transaction) => transaction.type === 'Expense')
+);
+
+const incomeCount = computed(() => income.value.length);
+const expenseCount = computed(() => expense.value.length);
+
+const incomeTotal = computed(() =>
+  income.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+);
+
+const expenseTotal = computed(() =>
+  expense.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+);
+
 const fetchTransactions = async (): Promise<Transaction[]> => {
   isLoading.value = true;
   try {
@@ -39,7 +58,8 @@ const fetchTransactions = async (): Promise<Transaction[]> => {
   }
 };
 
-const refreshTransactions = async () => transactions.value = await fetchTransactions()
+const refreshTransactions = async () =>
+  (transactions.value = await fetchTransactions());
 
 await refreshTransactions();
 
@@ -74,7 +94,7 @@ const transactionsGroupedByDate = computed(() => {
     <AppTrend
       color="green"
       title="Income"
-      :amount="4000"
+      :amount="incomeTotal"
       :last-amount="3000"
       :loading="isLoading"
     />
@@ -82,7 +102,7 @@ const transactionsGroupedByDate = computed(() => {
     <AppTrend
       color="red"
       title="Expenses"
-      :amount="4000"
+      :amount="expenseTotal"
       :last-amount="8000"
       :loading="isLoading"
     />
@@ -102,6 +122,18 @@ const transactionsGroupedByDate = computed(() => {
       :last-amount="11000"
       :loading="isLoading"
     />
+  </section>
+
+  <section class="flex justify-between mb-10">
+    <div>
+      <h2 text-2xl font-extrabold>Transactions</h2>
+      <div class="text-gray-500 dark:text-gray-400">
+        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses in this period.
+      </div>
+    </div>
+    <div>
+      <UButton icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add" />
+    </div>
   </section>
   <section v-if="!isLoading">
     <div
