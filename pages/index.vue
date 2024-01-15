@@ -19,30 +19,29 @@ interface GroupedTransactions {
 const selectedView = ref(transactionViewOptions[1]);
 const supabase = useSupabaseClient();
 const transactions = ref<Transaction[]>([]);
+const isLoading = ref(false);
 
-const { data, pending } = useAsyncData('transactions', async () => {
-  const { data, error } = await supabase
-    .from('transactions-FinanaceFolio')
-    .select();
+const fetchTransactions = async (): Promise<Transaction[]> => {
+  isLoading.value = true;
+  try {
+    const { data } = useAsyncData('transactions', async () => {
+      const { data, error } = await supabase
+        .from('transactions-FinanaceFolio')
+        .select();
 
-  // Ensure data is not null before assigning it
-  if (data) {
-    return data;
-  } else {
-    // Log and throw the error to be handled by useAsyncData's error handling
-    console.error(error);
-    throw new Error('Failed to fetch transactions');
+      if (error) return [];
+      return data as Transaction[];
+    });
+
+    return data.value || []; // Fallback to empty array if data.value is nullish
+  } finally {
+    isLoading.value = false;
   }
-});
-// We use `watch` to update the transactions ref whenever data changes. This is necessary because data is a reactive source, and we want to keep transactions in sync with it.
+};
 
-watch(
-  data,
-  (newData) => {
-    transactions.value = newData || [];
-  },
-  { immediate: true }
-);
+const refreshTransactions = async () => transactions.value = await fetchTransactions()
+
+await refreshTransactions();
 
 const transactionsGroupedByDate = computed(() => {
   // Define grouped with the correct type
@@ -58,7 +57,6 @@ const transactionsGroupedByDate = computed(() => {
   }
   return grouped;
 });
-console.log(transactionsGroupedByDate.value);
 </script>
 
 <template>
@@ -78,7 +76,7 @@ console.log(transactionsGroupedByDate.value);
       title="Income"
       :amount="4000"
       :last-amount="3000"
-      :loading="false"
+      :loading="isLoading"
     />
     <!-- Expenses Trend -->
     <AppTrend
@@ -86,7 +84,7 @@ console.log(transactionsGroupedByDate.value);
       title="Expenses"
       :amount="4000"
       :last-amount="8000"
-      :loading="false"
+      :loading="isLoading"
     />
     <!-- Savings Trend -->
     <AppTrend
@@ -94,7 +92,7 @@ console.log(transactionsGroupedByDate.value);
       title="Savings"
       :amount="4000"
       :last-amount="5000"
-      :loading="false"
+      :loading="isLoading"
     />
     <!-- Investment Trend -->
     <AppTrend
@@ -102,21 +100,28 @@ console.log(transactionsGroupedByDate.value);
       title="Investments"
       :amount="9000"
       :last-amount="11000"
-      :loading="false"
+      :loading="isLoading"
     />
   </section>
-  <section>
+  <section v-if="!isLoading">
     <div
       v-for="(transactionsOnDay, date) in transactionsGroupedByDate"
       :key="date"
       class="mb-10"
     >
-      <DailyTransactionSummary :date="(date as string)" :transactions="transactionsOnDay" />
-      <AppTransaction 
+      <DailyTransactionSummary
+        :date="(date as string)"
+        :transactions="transactionsOnDay"
+      />
+      <AppTransaction
         v-for="transaction in transactionsOnDay"
         :key="transaction.id"
         :transaction="transaction"
+        @deleted="refreshTransactions()"
       />
     </div>
+  </section>
+  <section v-else>
+    <USkeleton class="h-8 w-full mb-2" v-for="i in 4" :key="i" />
   </section>
 </template>
