@@ -17,6 +17,16 @@ const props = defineProps({
     required: true,
   },
 });
+const isIncome = computed(() => props.transaction.type === 'Income');
+
+const icon = computed(() =>
+  isIncome.value ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-left'
+);
+
+const iconColor = computed(() =>
+  isIncome.value ? 'text-green-600' : 'text-red-600'
+);
+
 const { currency } = useCurrency(props.transaction.amount);
 const items = [
   [
@@ -46,12 +56,16 @@ const items = [
   >
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-1">
-        <UIcon name="i-heroicons-arrow-up-right" class="text-green-600" />
-        <div>{{transaction.description}}</div>
+        <UIcon :name="icon" :class="[iconColor]" />
+        <div>{{ transaction.description }}</div>
       </div>
       <div>
         <div>
-          <UBadge v-if="transaction.category" :label="transaction.category" color="white" />
+          <UBadge
+            v-if="transaction.category"
+            :label="transaction.category"
+            color="white"
+          />
         </div>
       </div>
     </div>
