@@ -1,7 +1,43 @@
 <script setup lang="ts">
 import { transactionViewOptions } from '../constants';
 
+// Define the type for a transaction (adjust the properties according to your data model)
+interface Transaction {
+  id: number;
+  created_at: string;
+  amount: number;
+  type: string;
+  description: string;
+  category: string;
+}
+
 const selectedView = ref(transactionViewOptions[1]);
+const supabase = useSupabaseClient();
+const transactions = ref<Transaction[]>([]);
+
+const { data, pending } = useAsyncData('transactions', async () => {
+  const { data, error } = await supabase
+    .from('transactions-FinanaceFolio')
+    .select();
+
+  // Ensure data is not null before assigning it
+  if (data) {
+    return data;
+  } else {
+    // Log and throw the error to be handled by useAsyncData's error handling
+    console.error(error);
+    throw new Error('Failed to fetch transactions');
+  }
+});
+// We use `watch` to update the transactions ref whenever data changes. This is necessary because data is a reactive source, and we want to keep transactions in sync with it.
+
+watch(
+  data,
+  (newData) => {
+    transactions.value = newData || [];
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -49,9 +85,10 @@ const selectedView = ref(transactionViewOptions[1]);
     />
   </section>
   <section>
-    <AppTransaction />
-    <AppTransaction />
-    <AppTransaction />
-    <AppTransaction />
+    <AppTransaction
+      v-for="transaction in transactions"
+      :key="transaction.id"
+      :transaction="transaction"
+    />
   </section>
 </template>

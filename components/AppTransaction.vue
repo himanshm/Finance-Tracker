@@ -1,5 +1,23 @@
 <script setup lang="ts">
-const { currency } = useCurrency(3000);
+import type { PropType } from 'vue';
+
+// Define the structure of the transaction object as an interface
+interface Transaction {
+  id: number;
+  created_at: string;
+  amount: number;
+  type: string;
+  description: string;
+  category: string;
+}
+
+const props = defineProps({
+  transaction: {
+    type: Object as PropType<Transaction>,
+    required: true,
+  },
+});
+const { currency } = useCurrency(props.transaction.amount);
 const items = [
   [
     {
@@ -29,11 +47,11 @@ const items = [
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-1">
         <UIcon name="i-heroicons-arrow-up-right" class="text-green-600" />
-        <div>Paycheck</div>
+        <div>{{transaction.description}}</div>
       </div>
       <div>
         <div>
-          <UBadge label="Category" color="white" />
+          <UBadge v-if="transaction.category" :label="transaction.category" color="white" />
         </div>
       </div>
     </div>
