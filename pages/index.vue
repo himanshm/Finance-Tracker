@@ -93,11 +93,16 @@ const {
     grouped: { byDate },
   },
 } = useFetchTransactions(current);
+await refresh();
 
 const {
+  refresh: refreshPrevious,
   transactions: {
     incomeTotal: prevIncomeTotal,
     expenseTotal: prevExpenseTotal,
   },
 } = useFetchTransactions(previous);
+onMounted(async () => {
+  await refreshPrevious();
+});
 </script>

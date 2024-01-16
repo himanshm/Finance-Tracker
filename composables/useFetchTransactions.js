@@ -4,18 +4,18 @@ export const useFetchTransactions = (period) => {
   const pending = ref(false);
 
   const income = computed(() =>
-    transactions.value.filter((transaction) => transaction.type === 'Income')
+    transactions.value?.filter((transaction) => transaction.type === 'Income')
   );
   const expense = computed(() =>
-    transactions.value.filter((transaction) => transaction.type === 'Expense')
+    transactions.value?.filter((transaction) => transaction.type === 'Expense')
   );
   const incomeCount = computed(() => income.value.length);
   const expenseCount = computed(() => expense.value.length);
   const incomeTotal = computed(() =>
-    income.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+    income.value?.reduce((sum, transaction) => sum + transaction.amount, 0)
   );
   const expenseTotal = computed(() =>
-    expense.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+    expense.value?.reduce((sum, transaction) => sum + transaction.amount, 0)
   );
 
   const fetchTransactions = async () => {
@@ -42,7 +42,7 @@ export const useFetchTransactions = (period) => {
 
   const refresh = async () => (transactions.value = await fetchTransactions());
 
-  watch(period, async () => await refresh(), { immediate: true }); // Whenever the value of period is different, refetch the data. This watcher is called not only when the period changes but it's just called immediately. This means the refresh() would always be called whenever this composable is used
+  watch(period, async () => await refresh());
 
   const transactionsGroupedByDate = computed(() => {
     let grouped = {};
