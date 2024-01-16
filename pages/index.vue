@@ -45,7 +45,11 @@ const fetchTransactions = async (): Promise<Transaction[]> => {
   isLoading.value = true;
   try {
     const { data } = useAsyncData('transactions', async () => {
-      const { data, error } = await supabase.from('transactions-FinanaceFolio').select();
+      const { data, error } = await supabase
+        .from('transactions-FinanaceFolio')
+        .select()
+        .order('created_at', { ascending: false });
+      // whenever you can use backend sorting we should go with that
 
       if (error) return [];
       return data as Transaction[];
@@ -73,6 +77,15 @@ const transactionsGroupedByDate = computed(() => {
     }
     grouped[date].push(transaction);
   }
+
+  // Sorting in the front end
+  // const sortedKeys = Object.keys(grouped).sort().reverse();  // Descending Order
+  // const sortedGrouped: GroupedTransactions = {};
+
+  // for (const key of sortedKeys) {
+  // sortedGrouped[key] = grouped[key]
+  // }
+  // return sortedGrouped;
   return grouped;
 });
 </script>
