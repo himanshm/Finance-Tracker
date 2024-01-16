@@ -13,10 +13,7 @@ const categories = ['Food', 'Housing', 'Car', 'Entertainment'];
 
 async function seedTransactions() {
   // Delete existing data
-  const { error: deleteError } = await supabase
-    .from('transactions-FinanaceFolio')
-    .delete()
-    .gte('id', 0);
+  const { error: deleteError } = await supabase.from('transactions').delete().gte('id', 0);
 
   if (deleteError) {
     console.error('Error deleting existing data:', deleteError);
@@ -71,9 +68,7 @@ async function seedTransactions() {
     }
   }
 
-  const { error: insertError } = await supabase
-    .from('transactions-FinanaceFolio')
-    .upsert(transactions);
+  const { error: insertError } = await supabase.from('transactions').upsert(transactions);
 
   if (insertError) {
     console.error('Error inserting data:', insertError);
