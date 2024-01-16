@@ -25,9 +25,7 @@ const icon = computed(() =>
   isIncome.value ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-left'
 );
 
-const iconColor = computed(() =>
-  isIncome.value ? 'text-green-600' : 'text-red-600'
-);
+const iconColor = computed(() => (isIncome.value ? 'text-green-600' : 'text-red-600'));
 
 const { currency } = useCurrency(props.transaction.amount);
 
@@ -38,16 +36,13 @@ const deleteTransaction = async () => {
   isLoading.value = true;
 
   try {
-    await supabase
-      .from('transactions-FinanaceFolio')
-      .delete()
-      .eq('id', props.transaction.id);
+    await supabase.from('transactions-FinanaceFolio').delete().eq('id', props.transaction.id);
     toast.add({
       title: 'Transaction Deleted',
       icon: 'i-heroicons-check-circle',
     });
 
-  emit('deleted', props.transaction.id);
+    emit('deleted', props.transaction.id);
   } catch (error) {
     toast.add({
       title: 'Transaction Deleted',
@@ -79,20 +74,16 @@ const items = [
 
 <template>
   <div
-    class="grid grid-cols-2 py-4 border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100"
+    class="grid grid-cols-3 py-4 border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100"
   >
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between space-x-6 col-span-2">
       <div class="flex items-center space-x-1">
         <UIcon :name="icon" :class="[iconColor]" />
         <div>{{ transaction.description }}</div>
       </div>
       <div>
         <div>
-          <UBadge
-            v-if="transaction.category"
-            :label="transaction.category"
-            color="white"
-          />
+          <UBadge v-if="transaction.category" :label="transaction.category" color="white" />
         </div>
       </div>
     </div>

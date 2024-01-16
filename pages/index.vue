@@ -45,9 +45,7 @@ const fetchTransactions = async (): Promise<Transaction[]> => {
   isLoading.value = true;
   try {
     const { data } = useAsyncData('transactions', async () => {
-      const { data, error } = await supabase
-        .from('transactions-FinanaceFolio')
-        .select();
+      const { data, error } = await supabase.from('transactions-FinanaceFolio').select();
 
       if (error) return [];
       return data as Transaction[];
@@ -59,8 +57,7 @@ const fetchTransactions = async (): Promise<Transaction[]> => {
   }
 };
 
-const refreshTransactions = async () =>
-  (transactions.value = await fetchTransactions());
+const refreshTransactions = async () => (transactions.value = await fetchTransactions());
 
 await refreshTransactions();
 
@@ -88,9 +85,7 @@ const transactionsGroupedByDate = computed(() => {
     </div>
   </section>
 
-  <section
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10"
-  >
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
     <!-- Income Trend -->
     <AppTrend
       color="green"
@@ -129,8 +124,7 @@ const transactionsGroupedByDate = computed(() => {
     <div>
       <h2 text-2xl font-extrabold>Transactions</h2>
       <div class="text-gray-500 dark:text-gray-400">
-        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses in
-        this period.
+        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses in this period.
       </div>
     </div>
     <div>
@@ -145,15 +139,8 @@ const transactionsGroupedByDate = computed(() => {
     </div>
   </section>
   <section v-if="!isLoading">
-    <div
-      v-for="(transactionsOnDay, date) in transactionsGroupedByDate"
-      :key="date"
-      class="mb-10"
-    >
-      <DailyTransactionSummary
-        :date="(date as string)"
-        :transactions="transactionsOnDay"
-      />
+    <div v-for="(transactionsOnDay, date) in transactionsGroupedByDate" :key="date" class="mb-10">
+      <DailyTransactionSummary :date="(date as string)" :transactions="transactionsOnDay" />
       <AppTransaction
         v-for="transaction in transactionsOnDay"
         :key="transaction.id"
