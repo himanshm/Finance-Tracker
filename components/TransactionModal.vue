@@ -6,12 +6,6 @@ const props = defineProps({
 });
 const emit = defineEmits(['update:modalValue']);
 
-// define a computed value or writable computed
-const isOpen = computed({
-  get: () => props.modalValue,
-  set: (newValue) => emit('update:modalValue', newValue),
-});
-
 const defaultSchema = z.object({
   created_at: z.string(),
   description: z.string().optional(),
@@ -41,7 +35,12 @@ const schema = z.intersection(
 const form = ref();
 
 const save = async () => {
-  form.value.validate();
+  // We don't have to explicitly call this validate method, because it would be automatically called on specific events like 'blur', 'input', 'change' and 'submit' and this can be configured
+  // form.value.validate();
+
+  if (form.value.errors.lenght) return;
+
+  // Store data in supabase
 };
 
 // An interface for the state
@@ -53,12 +52,32 @@ interface State {
   category: string | undefined;
 }
 
-const state = ref<State>({
+const initialState = {
   type: undefined,
   amount: 0,
   created_at: undefined,
   description: undefined,
   category: undefined,
+};
+
+const state = ref<State>({
+  ...initialState,
+});
+
+const resetForm = () => {
+  Object.assign(state.value, initialState);
+
+  // Clear all the form errors no matter they exist or not
+  form.value.clear();
+};
+
+// define a computed value or writable computed
+const isOpen = computed({
+  get: () => props.modalValue,
+  set: (newValue) => {
+    if (!newValue) resetForm();
+    emit('update:modalValue', newValue);
+  },
 });
 
 const isCategoryVisible = computed(() => state.value.type === 'Expense');
