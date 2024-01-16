@@ -1,38 +1,35 @@
-<script setup lang="ts">
-// Use Google fonts
-useHead({
-  link: [
-    {
-      rel: 'preconnect',
-      href: 'https://fonts.googleapis.com',
-    },
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Inter&display=swap',
-      crossorigin: '',
-    },
-  ],
-});
-</script>
-
 <template>
   <div class="container mx-auto max-w-4xl">
-    <AppHeader />
     <main class="my-10">
       <slot />
     </main>
   </div>
 </template>
 
+<script setup>
+// Link to Google Fonts
+useHead({
+  link: [
+    {
+      rel: 'preconnect',
+      href: 'https://fonts.googleapis.com'
+    },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Inter&display=swap',
+      crossorigin: ''
+    }
+  ]
+})
+</script>
+
 <style>
-/*  Set the font family for entire site */
-
+/* Set the font family for the entire site */
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter';
 }
-
 /* Set the background color for the entire site */
 body {
-  @apply bg-white dark:bg-gray-900;
+  @apply dark:bg-gray-900 bg-white
 }
 </style>
