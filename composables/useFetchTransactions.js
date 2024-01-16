@@ -1,4 +1,4 @@
- export const useFetchTransactions = () => {
+export const useFetchTransactions = (period) => {
   const supabase = useSupabaseClient();
   const transactions = ref([]);
   const pending = ref(false);
@@ -21,14 +21,19 @@
   const fetchTransactions = async () => {
     pending.value = true;
     try {
-      const { data } = await useAsyncData('transactions', async () => {
-        const { data, error } = await supabase
-          .from('transactions')
-          .select()
-          .order('created_at', { ascending: false });
-        if (error) return [];
-        return data;
-      });
+      const { data } = await useAsyncData(
+        `transactions-${period.value.from.toDateString()}-${period.value.to.toDateString()}`,
+        async () => {
+          const { data, error } = await supabase
+            .from('transactions')
+            .select()
+            .gte('created_at', period.value.from.toISOString())
+            .lte('created_at', period.value.to.toISOString())
+            .order('created_at', { ascending: false });
+          if (error) return [];
+          return data;
+        }
+      );
       return data.value;
     } finally {
       pending.value = false;
@@ -36,6 +41,8 @@
   };
 
   const refresh = async () => (transactions.value = await fetchTransactions());
+
+  watch(period, async () => await refresh(), { immediate: true }); // Whenever the value of period is different, refetch the data. This watcher is called not only when the period changes but it's just called immediately. This means the refresh() would always be called whenever this composable is used
 
   const transactionsGroupedByDate = computed(() => {
     let grouped = {};
@@ -49,21 +56,21 @@
 
     return grouped;
   });
-    
-    return {
-        transactions: {
-            all: transactions,
-            grouped: {
-                byDate: transactionsGroupedByDate
-            },
-            income,
-            expense,
-            incomeTotal,
-            expenseTotal,
-            incomeCount,
-            expenseCount
-        },
-        refresh,
-        pending
-    }
+
+  return {
+    transactions: {
+      all: transactions,
+      grouped: {
+        byDate: transactionsGroupedByDate,
+      },
+      income,
+      expense,
+      incomeTotal,
+      expenseTotal,
+      incomeCount,
+      expenseCount,
+    },
+    refresh,
+    pending,
+  };
 };

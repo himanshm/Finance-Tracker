@@ -9,28 +9,28 @@
   <section
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10"
   >
-    <Trend
+    <AppTrend
       color="green"
       title="Income"
       :amount="incomeTotal"
-      :last-amount="4100"
+      :last-amount="prevIncomeTotal"
       :loading="pending"
     />
-    <Trend
+    <AppTrend
       color="red"
       title="Expense"
       :amount="expenseTotal"
-      :last-amount="3800"
+      :last-amount="prevExpenseTotal"
       :loading="pending"
     />
-    <Trend
+    <AppTrend
       color="green"
       title="Investments"
       :amount="4000"
       :last-amount="3000"
       :loading="pending"
     />
-    <Trend
+    <AppTrend
       color="red"
       title="Saving"
       :amount="4000"
@@ -81,7 +81,7 @@ import { transactionViewOptions } from '~/constants';
 const selectedView = ref(transactionViewOptions[1]);
 const isOpen = ref(false);
 
-const dates = useSelectedTimePeriod(selectedView);
+const { current, previous } = useSelectedTimePeriod(selectedView);
 const {
   pending,
   refresh,
@@ -92,7 +92,12 @@ const {
     expenseTotal,
     grouped: { byDate },
   },
-} = useFetchTransactions();
+} = useFetchTransactions(current);
 
-await refresh();
+const {
+  transactions: {
+    incomeTotal: prevIncomeTotal,
+    expenseTotal: prevExpenseTotal,
+  },
+} = useFetchTransactions(previous);
 </script>
