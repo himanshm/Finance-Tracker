@@ -2,18 +2,28 @@
   <UCard v-if="!success">
     <template #header> Sign-in to FinanceFolio </template>
 
-    <form>
+    <form @submit.prevent="handleLogin">
       <UFormGroup
         label="Email"
         name="email"
         class="mb-4"
         :required="true"
-        help="You will receive an email with the confirmation link."
-      >
-        <UInput type="email" placeholder="Email" required />
+        help="You will receive an email with the confirmation link.">
+        <UInput
+          type="email"
+          placeholder="Email"
+          required
+          v-model="email" />
       </UFormGroup>
 
-      <UButton type="submit" variant="solid" color="black" @click="success=true">Sign-in</UButton>
+      <UButton
+        type="submit"
+        variant="solid"
+        color="black"
+        :loading="pending"
+        :disabled="pending">
+        Sign-in
+      </UButton>
     </form>
   </UCard>
 
@@ -22,8 +32,7 @@
 
     <div class="text-center">
       <p class="mb-4">
-        We have sent an email to <strong>test@test.com</strong> with a link to
-        Sign-in.
+        We have sent an email to <strong>{{ email }}</strong> with a link to Sign-in.
       </p>
       <p><strong>Important:</strong> This link will expire in 5 minutes.</p>
     </div>
@@ -31,5 +40,32 @@
 </template>
 
 <script setup>
-const success = ref(false);
+  const success = ref(false);
+  const email = ref('');
+  const pending = ref(false);
+  const toast = useToast();
+  const supabase = useSupabaseClient();
+  const handleLogin = async () => {
+    pending.value = true;
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.value,
+        options: {
+          emailRedirectTo: 'http://localhost:3000',
+        },
+      });
+      if (error) {
+        toast.add({
+          title: 'Error authenticating',
+          icon: 'i-heroicons-exlamation-circle',
+          description: error.message,
+          color: 'red',
+        });
+      } else {
+        success.value = true;
+      }
+    } finally {
+      pending.value = false;
+    }
+  };
 </script>
