@@ -45,13 +45,16 @@
   const pending = ref(false);
   const toast = useToast();
   const supabase = useSupabaseClient();
+
+  // useAuthenticatedUser();
+
   const handleLogin = async () => {
     pending.value = true;
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.value,
         options: {
-          emailRedirectTo: 'http://localhost:3000',
+          emailRedirectTo: 'http://localhost:3000/confirm',
         },
       });
       if (error) {
