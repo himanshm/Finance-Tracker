@@ -46,7 +46,7 @@
   const toast = useToast();
   const supabase = useSupabaseClient();
 
-  // useAuthenticatedUser();
+  useAuthenticatedUser();
 
   const handleLogin = async () => {
     pending.value = true;

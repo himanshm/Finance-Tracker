@@ -7,6 +7,5 @@
 </template>
 
 <script setup>
-  console.log('I am running');
   useAuthenticatedUser();
 </script>
