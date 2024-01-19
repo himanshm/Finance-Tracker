@@ -1,7 +1,8 @@
 <template>
-  <UFOrm
+  <UForm
     :state="state"
-    :schema="schema">
+    :schema="schema"
+    @submit="saveProfile">
     <UFormGroup
       class="mb-4"
       label="Full Name"
@@ -22,8 +23,9 @@
       color="black"
       variant="solid"
       label="save"
-      :pending="pending" />
-  </UFOrm>
+      :loading="pending"
+      :disabled="pending" />
+  </UForm>
 </template>
 
 <script setup>
@@ -36,7 +38,7 @@
   const pending = ref(false);
 
   const state = ref({
-    fullName: '',
+    fullName: user.value.user_metadata?.full_name,
     email: user.value?.email,
   });
 
@@ -44,4 +46,36 @@
     fullName: z.string().min(2).optional(),
     email: z.string().email(),
   });
+
+  const saveProfile = async () => {
+    pending.value = true;
+
+    try {
+      const data = {
+        data: {
+          full_name: state.value.fullName,
+        },
+      };
+
+      if (state.value.email !== user.value.email) {
+        data.email = state.value.email;
+      }
+        console.log(data);
+        
+      const { error } = await supabase.auth.updateUser(data);
+      if (error) throw error;
+
+      toastSuccess({
+        title: 'Profile Updated!',
+        description: 'Your profile has been updated!',
+      });
+    } catch (error) {
+      toastError({
+        title: 'Error updating profile',
+        description: error.message,
+      });
+    } finally {
+      pending.value = false;
+    }
+  };
 </script>
