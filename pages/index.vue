@@ -68,7 +68,7 @@
         :transaction="transaction"
         @deleted="refresh()"
       />
-      />
+      
     </div>
   </section>
   <section v-else>
