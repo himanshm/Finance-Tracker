@@ -44,8 +44,6 @@
   const uploading = ref(false);
   const fileInput = ref(); // Reference to an input with ref="fileInput" attribute
 
-  console.log(user.value);
-
   const saveAvatar = async () => {
     // 1. Get the uploaded file
     //    a) If no file uploaded, show toast error
@@ -60,6 +58,7 @@
     const fileExt = file.name.split('.').pop();
 
     const fileName = `${Math.random()}.${fileExt}`;
+    console.log(fileName);
 
     try {
       uploading.value = true;
@@ -76,6 +75,12 @@
         },
       });
       // 4. (OPTIONALLY) remove the old avatar file
+      // If something is not null or not undefined it means it exists
+      if (currentAvatarUrl) {
+        const { error } = await supabase.storage.from('avatars').remove([currentAvatarUrl]);
+        if (error) throw error;
+      }
+
       // 5. Reset the file input
       fileInput.value.input.value = null;
 
