@@ -44,6 +44,8 @@
   const uploading = ref(false);
   const fileInput = ref(); // Reference to an input with ref="fileInput" attribute
 
+  console.log(user.value);
+
   const saveAvatar = async () => {
     // 1. Get the uploaded file
     //    a) If no file uploaded, show toast error
@@ -55,21 +57,27 @@
       toastError({ title: 'Select a file to upload first!' });
       return;
     }
-
-    console.log(file);
-
     const fileExt = file.name.split('.').pop();
 
-    const fileName = `${Math.random()}.${fileExt}`
-    console.log(fileName);
+    const fileName = `${Math.random()}.${fileExt}`;
 
     try {
       uploading.value = true;
       // 1. Grab the current avatar URL
+      const currentAvatarUrl = user.value.user_metadata?.avatar_url;
       // 2. Upload the image to avatars bucket
+      const { error } = await supabase.storage.from('avatars').upload(fileName, file);
+
+      if (error) throw error; // This moves the error handling immediately to the catch block
       // 3. Update the user metadata with the avatar URL
+      await supabase.auth.updateUser({
+        data: {
+          avatar_url: fileName,
+        },
+      });
       // 4. (OPTIONALLY) remove the old avatar file
       // 5. Reset the file input
+      fileInput.value.input.value = null;
 
       toastSuccess({
         title: 'Avatar uploaded',
