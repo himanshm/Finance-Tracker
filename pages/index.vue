@@ -67,7 +67,8 @@
         v-for="transaction in transactionsOnDay"
         :key="transaction.id"
         :transaction="transaction"
-        @deleted="refresh()" />
+        @deleted="refresh()"
+        @edited="refresh()" />
     </div>
   </section>
   <section v-else>
