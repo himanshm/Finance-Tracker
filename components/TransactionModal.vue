@@ -1,7 +1,7 @@
 <template>
   <UModal v-model="isOpen">
     <UCard>
-      <template #header> Add Transaction </template>
+      <template #header> {{ isEditing ? 'Edit' : 'Add' }} Transaction </template>
 
       <div>Hello!</div>
       <UForm
@@ -14,7 +14,9 @@
           label="Transaction Type"
           name="type"
           class="mb-4">
+          <!-- Cannot change the type when editing -->
           <USelect
+            :disabled="isEditing"
             placeholder="Select the transaction type"
             :options="types"
             v-model="state.type" />
@@ -80,12 +82,18 @@
   import { z } from 'zod';
   const props = defineProps({
     modelValue: Boolean,
+    // TO check if we are editing a transaction
+    transaction: {
+      type: Object,
+      required: false,
+    },
   });
   const emit = defineEmits(['update:modelValue', 'saved']);
   const form = ref();
   const isLoading = ref(false);
   const supabase = useSupabaseClient();
   const { toastSuccess, toastError } = useAppToast();
+  const isEditing = computed(() => !!props.transaction); // !! converts falsy values to boolean false and truthy values to boolean true
   const initialState = {
     type: undefined,
     amount: 0,
@@ -94,9 +102,22 @@
     category: undefined,
   };
 
-  const state = ref({
-    ...initialState,
-  });
+  const state = ref(
+    isEditing.value
+      ? {
+          type: props.transaction.type,
+          amount: props.transaction.amount,
+          created_at: props.transaction.created_at,
+          description: props.transaction.description,
+          category: props.transaction.category,
+        }
+      : { ...initialState }
+  );
+
+  const resetForm = () => {
+    Object.assign(state.value, initialState);
+    form.value.clear();
+  };
 
   const isOpen = computed({
     get: () => props.modelValue,
@@ -129,17 +150,15 @@
     defaultSchema
   );
 
-  const resetForm = () => {
-    Object.assign(state.value, initialState);
-    form.value.clear();
-  };
-
   const save = async () => {
     if (form.value.errors.length) return;
     // Store into the supabase
     isLoading.value = true;
     try {
-      const { error } = await supabase.from('transactions').upsert({ ...state.value });
+      const { error } = await supabase
+        .from('transactions')
+        .upsert({ ...state.value, id: props.transaction?.id });
+        
       if (!error) {
         toastSuccess({
           title: 'Transaction saved.',
