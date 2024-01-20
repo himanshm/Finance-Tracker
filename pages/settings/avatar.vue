@@ -6,7 +6,7 @@
         class="w-full"
         help="This would be blank by default">
         <UAvatar
-          src="https://avatars.githubusercontent.com/u/739984?v=4"
+          :src="url"
           size="3xl" />
       </UFormGroup>
     </div>
@@ -40,6 +40,7 @@
 
   // We need to get the actual avatar URL
   const { toastSuccess, toastError } = useAppToast();
+  const { url } = useAvatarUrl();
 
   const uploading = ref(false);
   const fileInput = ref(); // Reference to an input with ref="fileInput" attribute
@@ -57,7 +58,7 @@
     }
     const fileExt = file.name.split('.').pop();
 
-    const fileName = `${Math.random()}.${fileExt}`;
+    const fileName = `avatar-${Math.floor(Math.random() * 999)}.${fileExt}`;
     console.log(fileName);
 
     try {
