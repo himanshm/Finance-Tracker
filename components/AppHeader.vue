@@ -11,7 +11,7 @@
         :ui="{ item: { disabled: 'cursor-text select-text' }, width: 'w-64' }"
         :popper="{ placement: 'bottom-start' }"
         v-if="user">
-        <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
+        <UAvatar :src="url" />
 
         <template #account="{ item }">
           <div class="text-left">
@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+  const { url } = useAvatarUrl();
   const supabase = useSupabaseClient();
   const user = useSupabaseUser();
 
@@ -49,7 +50,7 @@
       {
         label: 'Settings',
         icon: 'i-heroicons-cog-8-tooth',
-        onClick: () => console.log('Link to settings in the future'),
+        click: () => navigateTo('/settings/profile'),
       },
       {
         label: 'Sign out',
