@@ -11,18 +11,18 @@
 </template>
 
 <script setup>
-const links = [
+  const links = [
     {
-        label: 'Profile',
-        to: '/settings/profile'
+      label: 'Profile',
+      to: '/settings/profile',
     },
     {
-        label: 'Avatar',
-        to: '/settings/avatar'
+      label: 'Avatar',
+      to: '/settings/avatar',
     },
     {
-        label: 'settings',
-        to: '/settings/settings'
-    }
-]
+      label: 'Preferences',
+      to: '/settings/preferences',
+    },
+  ];
 </script>
