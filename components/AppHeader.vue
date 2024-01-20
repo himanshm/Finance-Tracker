@@ -2,8 +2,8 @@
   <header class="flex justify-between items-center mt-10">
     <NuxtLink
       to="/"
-      class="text-xl font-bold">
-      Finance Tracker
+      class="text-2xl font-bold">
+      FinanceFolio
     </NuxtLink>
     <div>
       <UDropdown
@@ -11,7 +11,7 @@
         :ui="{ item: { disabled: 'cursor-text select-text' }, width: 'w-64' }"
         :popper="{ placement: 'bottom-start' }"
         v-if="user">
-        <UAvatar :src="url" />
+        <UAvatar :src="url" size="2xl" />
 
         <template #account="{ item }">
           <div class="text-left">
