@@ -29,6 +29,10 @@
             variant="ghost"
             trailing-icon="i-heroicons-ellipsis-horizontal"
             :loading="isLoading" />
+          <TransactionModal
+            v-model="isOpen"
+            :transaction="transaction"
+            @saved="emit('edited')" />
         </UDropdown>
       </div>
     </div>
@@ -36,20 +40,24 @@
 </template>
 
 <script setup>
+  const supabase = useSupabaseClient();
   const props = defineProps({
     transaction: Object,
   });
-  const emit = defineEmits(['deleted']);
+  const emit = defineEmits(['deleted', 'edited']);
+
+  const isLoading = ref(false);
+  const isOpen = ref(false);
+
+  const { currency } = useCurrency(props.transaction.amount);
+  const { toastSuccess, toastError } = useAppToast();
+
   const isIncome = computed(() => props.transaction.type === 'Income');
   const icon = computed(() =>
     isIncome.value ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-left'
   );
   const iconColor = computed(() => (isIncome.value ? 'text-green-600' : 'text-red-600'));
-  const { currency } = useCurrency(props.transaction.amount);
 
-  const isLoading = ref(false);
-  const { toastSuccess, toastError } = useAppToast();
-  const supabase = useSupabaseClient();
   const deleteTransaction = async () => {
     isLoading.value = true;
     try {
@@ -72,7 +80,7 @@
       {
         label: 'Edit',
         icon: 'i-heroicons-pencil-square-20-solid',
-        click: () => console.log('Edit'),
+        click: () => (isOpen.value = true),
       },
       {
         label: 'Delete',

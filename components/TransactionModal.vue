@@ -107,7 +107,7 @@
       ? {
           type: props.transaction.type,
           amount: props.transaction.amount,
-          created_at: props.transaction.created_at,
+          created_at: props.transaction.created_at.split('T')[0],
           description: props.transaction.description,
           category: props.transaction.category,
         }
@@ -158,7 +158,7 @@
       const { error } = await supabase
         .from('transactions')
         .upsert({ ...state.value, id: props.transaction?.id });
-        
+
       if (!error) {
         toastSuccess({
           title: 'Transaction saved.',
